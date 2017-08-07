@@ -50,30 +50,7 @@ def compute_value(index, value, value_n, arms):
 
     return new_value
 
-def binnify(n_bins, data):
-    """Puts data into equal sized bins
-
-    n_bins : amount of bins
-    data : data to puts in bins
-
-    Not very generic
-    """
-
-    bins = [0]*(n_bins+1)
-
-    max_val = max(data)
-    min_val = min(data)
-    span = abs(max_val-min_val)/n_bins
-
-    min_val = abs(min_val)
-    for x in data:
-        bins[round((x + min_val)/span)] += 1
-
-    return bins
-
-
 def show_data(data, labels):
-    print(data)
     for row in data:
         plt.plot(row)
 
