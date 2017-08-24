@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random
 
-def testbed(n_set, n_arms, n_iter, select_index, select_parameter):
+def testbed(n_set, n_arms, n_iter, select_index, select_parameter, action_value_function, step):
     """Implementation of exercise 2.2
 
     from Reinforcement Learning: An Introduction
@@ -13,15 +13,16 @@ def testbed(n_set, n_arms, n_iter, select_index, select_parameter):
 
     for i in range(n_set):
         value = [0] * n_arms
-        value_n = [0] * n_arms
+        value_n = [1] * n_arms
 
-        arms = [np.random.normal() for _ in range(n_arms)]
+        arms = [np.random.random()  - 0.5] * n_arms
+        value_history = list(map(lambda x: [x], arms))
 
         for j in range(n_iter):
 
             index = select_index(value, n_arms, select_parameter);
 
-            new_value = compute_value(index, value, value_n, arms)
+            (new_value, arms) = compute_value(index, value, value_n, arms, action_value_function, step, value_history)
 
             update_performance(performance, j, i, new_value)
 
@@ -54,7 +55,10 @@ def softmax_select(value, n_arms, temp):
     """
 
     # generate Gibbs distribution
-    e_values = list(map(lambda x: np.math.exp(x/temp), value))
+    try:
+        e_values = list(map(lambda x: np.math.exp(x/temp), value))
+    except Exception:
+        print("You temperature is too low! Math overflow error.")
     sum_e = sum(e_values)
 
     if(sum_e == 0):
@@ -76,18 +80,48 @@ def softmax_select(value, n_arms, temp):
 def update_performance(performance, curr_iter, curr_set, value):
     performance[curr_iter] = (performance[curr_iter]*curr_set + value)/(curr_set+1)
 
-def compute_value(index, value, value_n, arms):
+def compute_value(chosen_arm_index, value, value_n, arms, action_value_function):
     """Function handles updating values
+
+    Currently:
+    - computation of action-values
+    - random walk for true values
 
     """
 
-    new_value = arms[index] + np.random.normal()
+    # computation of action-values
+    new_value = arms[chosen_arm_index] + np.random.normal()
 
-    value[index] = (value[index]*value_n[index] + new_value)
-    value_n[index] += 1
-    value[index] /= value_n[index]
+    action_value_function(chosen_arm_index, value, value_n, new_value)
 
-    return new_value
+    # random walk for true values
+    arms = list(map(lambda x: x + np.random.random() - 0.5, arms))
+
+    return (new_value, arms)
+
+def incremental_average_action_value(chosen_arm_index, value, value_n, new_value):
+    """Computing action values
+
+    Simple incremental determination of average value
+
+    """
+    value[chosen_arm_index] = value[chosen_arm_index] + (1/value_n[chosen_arm_index])*(new_value-value[chosen_arm_index])
+    value_n[chosen_arm_index] += 1
+
+def constant_step_action_value(chosen_arm_index, value, value_n, new_value, step, value_history):
+    """Computing action values
+
+    Uses constant step value to compute weighted average value
+
+    """
+    value_history[chosen_arm_index].append(new_value)
+    tmp = pow(1-step, len(value_history[chosen_arm_index])-1)*value_history[chosen_arm_index][0]
+
+    for i in range(1,len(value_history)):
+        tmp = pow(1-step, len(value_history[chosen_arm_index]) - i - 1)*step*value_history[i]
+
+    value[chosen_arm_index] = tmp
+
 
 def show_data(data, labels):
     for row in data:
@@ -108,11 +142,11 @@ if __name__ == "__main__":
     show_data(data, epsilons)
     """
 
-    temperatues = [0.01, 0.05, 0.1]
+    temperatues = [0.5, 1, 5]
 
     data = []
     for temperatue in temperatues:
-        data.append(testbed(2000, 10, 1000, softmax_select, temperatue))
+        data.append(testbed(2000, 10, 1000, softmax_select, temperatue, incremental_average_action_value))
         print("Calculation for temperature={} ready".format(temperatue))
 
     show_data(data, temperatues)
