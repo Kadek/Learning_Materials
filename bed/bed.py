@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import random
 
-def testbed(n_set, n_arms, n_iter, select_index, select_parameter, action_value_function, step):
+def testbed(n_set, n_arms, n_iter, select_index, select_parameter, action_value_function, step=0):
     """Implementation of exercise 2.2
 
     from Reinforcement Learning: An Introduction
@@ -80,7 +80,7 @@ def softmax_select(value, n_arms, temp):
 def update_performance(performance, curr_iter, curr_set, value):
     performance[curr_iter] = (performance[curr_iter]*curr_set + value)/(curr_set+1)
 
-def compute_value(chosen_arm_index, value, value_n, arms, action_value_function):
+def compute_value(chosen_arm_index, value, value_n, arms, action_value_function, step, value_history):
     """Function handles updating values
 
     Currently:
@@ -92,14 +92,14 @@ def compute_value(chosen_arm_index, value, value_n, arms, action_value_function)
     # computation of action-values
     new_value = arms[chosen_arm_index] + np.random.normal()
 
-    action_value_function(chosen_arm_index, value, value_n, new_value)
+    action_value_function(chosen_arm_index, value, value_n, new_value, step, value_history)
 
     # random walk for true values
     arms = list(map(lambda x: x + np.random.random() - 0.5, arms))
 
     return (new_value, arms)
 
-def incremental_average_action_value(chosen_arm_index, value, value_n, new_value):
+def incremental_average_action_value(chosen_arm_index, value, value_n, new_value, step, value_history):
     """Computing action values
 
     Simple incremental determination of average value
@@ -113,22 +113,26 @@ def constant_step_action_value(chosen_arm_index, value, value_n, new_value, step
 
     Uses constant step value to compute weighted average value
 
+    value_history is a monstrosity,
+    array where first element is the first average value
+    and then we start storing rewards.
+
     """
     value_history[chosen_arm_index].append(new_value)
-    tmp = pow(1-step, len(value_history[chosen_arm_index])-1)*value_history[chosen_arm_index][0]
+    tmp = np.power(1-step, len(value_history[chosen_arm_index]) - 1)
+    tmp *= value_history[chosen_arm_index][0]
 
-    for i in range(1,len(value_history)):
-        tmp = pow(1-step, len(value_history[chosen_arm_index]) - i - 1)*step*value_history[i]
+    for i in range(1,len(value_history[chosen_arm_index])):
+        tmp = pow(1-step, len(value_history[chosen_arm_index]) - i - 1)*step*value_history[chosen_arm_index][i]
 
     value[chosen_arm_index] = tmp
 
 
-def show_data(data, labels):
+def add_plot_data(data, labels):
     for row in data:
         plt.plot(row)
 
     plt.legend(labels)
-    plt.show()
 
 if __name__ == "__main__":
 
@@ -144,9 +148,11 @@ if __name__ == "__main__":
 
     temperatues = [0.5, 1, 5]
 
-    data = []
-    for temperatue in temperatues:
-        data.append(testbed(2000, 10, 1000, softmax_select, temperatue, incremental_average_action_value))
-        print("Calculation for temperature={} ready".format(temperatue))
-
-    show_data(data, temperatues)
+    for action in [incremental_average_action_value, constant_step_action_value]:
+        plt.figure(len(plt.get_fignums())+1)
+        data = []
+        for temperatue in temperatues:
+            data.append(testbed(2000, 10, 2000, softmax_select, temperatue, action, 0.1))
+            print("Calculation for temperature={} ready".format(temperatue))
+            add_plot_data(data, temperatues)
+    plt.show()
