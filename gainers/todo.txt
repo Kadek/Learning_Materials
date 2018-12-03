@@ -1,0 +1,4 @@
+- get all timespans
+- separate config
+- deploy
+- setup cron
