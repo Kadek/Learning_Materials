@@ -13,8 +13,12 @@ class DataTransformer():
 		result = {}
 		result["measurement"] = "coin"
 
-		result["tags"] = {"acronym": data["acronym"]}
-		del data["acronym"]
+		tags = ["acronym", "timespan"]
+		tags_data = {}
+		for tag in tags:
+			tags_data[tag] = data[tag]
+			del data[tag]
+		result["tags"] = tags_data
 
 		result["fields"] = data
 
