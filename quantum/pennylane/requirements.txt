@@ -1,0 +1,8 @@
+appdirs==1.4.3
+autograd==1.2
+future==0.17.1
+numpy==1.15.4
+PennyLane==0.1.0
+scipy==1.2.0
+semantic-version==2.6.0
+toml==0.10.0
