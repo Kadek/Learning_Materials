@@ -3,3 +3,4 @@
 - kafka connection to postgreqsl
 - kafka connection to some graph db
 - kafka connection to something based on hdfs
+- chronograf for influxdb
