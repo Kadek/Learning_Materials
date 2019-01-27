@@ -3,7 +3,7 @@ import urllib.parse
 import time
 
 from dataTransformer import DataTransformer
-from dbConnector import DBConnector
+from kafkaPublisher import KafkaPublisher
 from configMaster import ConfigMaster
 
 class GainersSpider(scrapy.Spider):
@@ -15,7 +15,7 @@ class GainersSpider(scrapy.Spider):
 	timespans = configMaster.config["timespans"]
 
 	data_transformer = DataTransformer()
-	db_connector = DBConnector()
+	kafka_publisher = KafkaPublisher()
 	markets_cache = set()
 
 	def parse(self, response):
@@ -55,7 +55,7 @@ class GainersSpider(scrapy.Spider):
 
 	def save_data(self, data, data_type):
 		transformed_data = self.data_transformer.transform(data, data_type)
-		self.db_connector.save(transformed_data, data_type)
+		self.kafka_publisher.publish(transformed_data)
 
 	def get_timespan(self, header, timespan):
 		return header + "-" + timespan

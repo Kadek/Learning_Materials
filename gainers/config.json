@@ -11,5 +11,8 @@
 	"username": "root",
 	"password": "root",
 	"db": "gainers",
-	"tables": ["coin", "market"]
+	"tables": ["coin", "market"],
+
+	"kafka_server": "localhost:9092",
+	"kafka_topic": "gainers"
 }
