@@ -1,11 +1,13 @@
 import json
+import os
 
 class ConfigMaster():
 
 	config = {}
 
 	def __init__(self):
-		self.load_config("config.json")
+                current_path = os.path.dirname(os.path.abspath(__file__))
+                self.load_config(current_path+"/config.json")
 
 	def load_config(self, filename):
 		with open(filename) as config_file:
