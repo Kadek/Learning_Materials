@@ -6,13 +6,13 @@
 	"delay_time": 5,
 	"headers": ["gainers", "losers"],
 	"timespans": ["1h", "24h", "7d"],
-	"address": "localhost",
+	"address": "influxdb",
 	"port": "8086",
 	"username": "root",
 	"password": "root",
 	"db": "gainers",
 	"tables": ["coin", "market"],
 
-	"kafka_server": "localhost:9092",
+	"kafka_server": "kafka:9092",
 	"kafka_topic": "gainers"
 }

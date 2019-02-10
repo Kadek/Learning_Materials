@@ -15,7 +15,7 @@ class InfluxConnector():
 	db = configMaster.config["db"]
 	tables = configMaster.config["tables"]
 
-	consumer = KafkaConsumer(configMaster.config["kafka_topic"])
+	consumer = KafkaConsumer(configMaster.config["kafka_topic"], bootstrap_servers=configMaster.config["kafka_server"])
 
 	def run(self):
 		print("Listening for messages...")
