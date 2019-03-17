@@ -1,0 +1,29 @@
+{
+	"spider_name": "gainers",
+	"start_urls": [
+		"https://coinmarketcap.com/gainers-losers/"
+	],
+	"delay_time": 5,
+	"headers": ["gainers", "losers"],
+	"timespans": ["1h", "24h", "7d"],
+
+	"influx_address": "influxdb",
+	"influx_port": "8086",
+	"influx_username": "root",
+	"influx_password": "root",
+	"influx_db": "gainers",
+
+	"postgres_address": "postgres",
+	"postgres_port": "5432",
+	"postgres_username": "postgres",
+	"postgres_password": "haslo123",
+	"postgres_db": "gainers",
+
+	"postgres_schema": {
+		"coin": ["change", "price", "volume", "name", "link", "acronym", "timespan"],
+		"market": ["name", "acronym", "volume", "price", "volume_share", "category", "fee_type", "updated"]
+	},
+
+	"kafka_server": "kafka:9092",
+	"kafka_topic": "gainers"
+}

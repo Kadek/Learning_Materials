@@ -12,7 +12,8 @@ class KafkaPublisher():
 	topic_name = configMaster.config["kafka_topic"]
 
 	def publish(self, data):
-		data = json.dumps(data[0])
+		print("Publishing message: {}".format(data))
+		data = json.dumps(data)
 		data = data.encode("utf-8")
 		self.producer.send(self.topic_name, data)
 		self.producer.flush()

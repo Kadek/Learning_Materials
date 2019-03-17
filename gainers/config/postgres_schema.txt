@@ -1,0 +1,27 @@
+CREATE DATABASE gainers;
+
+CREATE TABLE coin (
+	id INT GENERATED ALWAYS AS IDENTITY,
+	entry_time TIMESTAMP,
+	acronym TEXT,
+	change numeric(20,10),
+	link TEXT,
+	name TEXT,
+	price numeric(20,10),
+	timespan TEXT,
+	volume numeric(20,10)
+);
+
+CREATE TABLE market (
+	id INT GENERATED ALWAYS AS IDENTITY,
+	entry_time TIMESTAMP,
+	acronym TEXT,
+	category TEXT,
+	fee_type TEXT,
+	name TEXT,
+	price numeric(20,10),
+	updated TEXT,
+	volume numeric(20,10),
+	volume_share numeric(20,10)
+);
+

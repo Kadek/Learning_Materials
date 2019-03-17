@@ -2,7 +2,6 @@ import scrapy
 import urllib.parse
 import time
 
-from dataTransformer import DataTransformer
 from kafkaPublisher import KafkaPublisher
 from configMaster import ConfigMaster
 
@@ -14,7 +13,6 @@ class GainersSpider(scrapy.Spider):
 	headers = configMaster.config["headers"]
 	timespans = configMaster.config["timespans"]
 
-	data_transformer = DataTransformer()
 	kafka_publisher = KafkaPublisher()
 	markets_cache = set()
 
@@ -30,7 +28,8 @@ class GainersSpider(scrapy.Spider):
 						'acronym': coin.css('.text-left::text').extract_first(),
 						'volume': coin.css('.volume::text').extract_first(),
 						'price': coin.css('.price::text').extract_first(),
-						'change': coin.css('[class*="percent"]::text').extract_first()
+						'change': coin.css('[class*="percent"]::text').extract_first(),
+						'table': 'coin'
 					}
 					self.save_data(link_data, "coin")
 					next_page = self.get_next_page(response, link_data)
@@ -50,12 +49,12 @@ class GainersSpider(scrapy.Spider):
 				'category': market.css('td:nth-child(7)::text').extract_first(),
 				'fee type': market.css('td:nth-child(8)::text').extract_first(),
 				'updated': market.css('td:nth-child(9)::text').extract_first(),
+				'table': 'market'
 			}
 			self.save_data(market_data, "market")
 
 	def save_data(self, data, data_type):
-		transformed_data = self.data_transformer.transform(data, data_type)
-		self.kafka_publisher.publish(transformed_data)
+		self.kafka_publisher.publish(data)
 
 	def get_timespan(self, header, timespan):
 		return header + "-" + timespan
