@@ -33,4 +33,6 @@ services:
     image: kadek750/gainers:postgres_connector
   spider:
     image: kadek750/gainers:spider
-    restart: on-failure
+    deploy:
+        restart_policy:
+            condition: on-failure
